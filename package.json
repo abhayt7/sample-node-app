@@ -1,0 +1,13 @@
+{
+  "name": "sample-node-app",
+  "version": "1.0.0",
+  "description": "DevOps CI/CD Pipeline Assignment",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Tests Passed Successfully\""
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

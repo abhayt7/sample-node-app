@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "abhayt7/sample-node-app"
+        IMAGE_NAME = "abhay93/sample-node-app"
     }
 
     stages {
 
+        // STEP 1 - Checkout Code
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -14,6 +15,7 @@ pipeline {
             }
         }
 
+        // STEP 2 - Build Docker Image
         stage('Build Docker Image') {
             steps {
                 script {
@@ -22,6 +24,15 @@ pipeline {
             }
         }
 
+        // STEP 3 - Run Tests
+        stage('Test') {
+            steps {
+                sh 'npm install'
+                sh 'npm test'
+            }
+        }
+
+        // STEP 4 - Push Docker Image
         stage('Push Docker Image') {
             steps {
                 script {
@@ -32,6 +43,7 @@ pipeline {
             }
         }
 
+        // STEP 5 - Deploy Application
         stage('Deploy') {
             steps {
                 sh '''
@@ -39,9 +51,9 @@ pipeline {
                 docker rm sample-node-app || true
 
                 docker run -d \
-                --name sample-node-app \
-                -p 80:3000 \
-                abhayt7/sample-node-app:latest
+                  --name sample-node-app \
+                  -p 80:3000 \
+                  abhay93/sample-node-app:latest
                 '''
             }
         }

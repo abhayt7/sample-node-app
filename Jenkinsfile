@@ -5,9 +5,12 @@ pipeline {
         IMAGE_NAME = "abhay93/sample-node-app"
     }
 
+    triggers {
+        githubPush()
+    }
+
     stages {
 
-        // STEP 1 - Checkout Code
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -15,7 +18,6 @@ pipeline {
             }
         }
 
-        // STEP 2 - Build Docker Image
         stage('Build Docker Image') {
             steps {
                 script {
@@ -24,7 +26,6 @@ pipeline {
             }
         }
 
-        // STEP 3 - Run Tests
         stage('Test') {
             steps {
                 sh 'npm install'
@@ -32,7 +33,6 @@ pipeline {
             }
         }
 
-        // STEP 4 - Push Docker Image
         stage('Push Docker Image') {
             steps {
                 script {
@@ -43,12 +43,13 @@ pipeline {
             }
         }
 
-        // STEP 5 - Deploy Application
         stage('Deploy') {
             steps {
                 sh '''
                 docker stop sample-node-app || true
                 docker rm sample-node-app || true
+
+                docker pull abhay93/sample-node-app:latest
 
                 docker run -d \
                   --name sample-node-app \

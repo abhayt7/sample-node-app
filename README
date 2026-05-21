@@ -87,7 +87,7 @@ sample-node-app/
 ├── deployment.yaml
 ├── service.yaml
 ├── .env.example
-└── README.md
+└── README
 ```
 
 ---
@@ -500,7 +500,6 @@ pipeline {
         */
     }
 }
-
 ```
 
 ---

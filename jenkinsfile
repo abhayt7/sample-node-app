@@ -11,9 +11,9 @@ pipeline {
 
     stages {
 
-        // =====================================================
+        
         // STEP 1 - Checkout Source Code
-        // =====================================================
+        
 
         stage('Checkout') {
             steps {
@@ -22,9 +22,9 @@ pipeline {
             }
         }
 
-        // =====================================================
+        
         // STEP 2 - Build Docker Image
-        // =====================================================
+        
 
         stage('Build Docker Image') {
             steps {
@@ -34,9 +34,9 @@ pipeline {
             }
         }
 
-        // =====================================================
+        
         // STEP 3 - Run Tests
-        // =====================================================
+        
 
         stage('Test') {
             steps {
@@ -45,9 +45,9 @@ pipeline {
             }
         }
 
-        // =====================================================
+        
         // STEP 4 - Push Docker Image to DockerHub
-        // =====================================================
+        
 
         stage('Push Docker Image') {
             steps {
@@ -59,10 +59,10 @@ pipeline {
             }
         }
 
-        // =====================================================
+        
         // OPTIONAL - Push Docker Image to Amazon ECR
         // Uncomment this stage if using Amazon ECR
-        // =====================================================
+        
 
         /*
         stage('Push Image to ECR') {
@@ -81,10 +81,10 @@ pipeline {
         }
         */
 
-        // =====================================================
+        
         // OPTION 1 - Deploy on EC2 Docker Server
         // CURRENT ACTIVE DEPLOYMENT
-        // =====================================================
+        
 
         stage('Deploy') {
             steps {
@@ -103,10 +103,10 @@ pipeline {
             }
         }
 
-        // =====================================================
+        
         // OPTION 2 - Deploy on Kubernetes
         // Uncomment below stages if deploying on Kubernetes
-        // =====================================================
+        
 
         /*
         stage('Deploy to Kubernetes') {

@@ -11,12 +11,20 @@ pipeline {
 
     stages {
 
+        // =====================================================
+        // STEP 1 - Checkout Source Code
+        // =====================================================
+
         stage('Checkout') {
             steps {
                 git branch: 'main',
                 url: 'https://github.com/abhayt7/sample-node-app.git'
             }
         }
+
+        // =====================================================
+        // STEP 2 - Build Docker Image
+        // =====================================================
 
         stage('Build Docker Image') {
             steps {
@@ -26,12 +34,20 @@ pipeline {
             }
         }
 
+        // =====================================================
+        // STEP 3 - Run Tests
+        // =====================================================
+
         stage('Test') {
             steps {
                 sh 'npm install'
                 sh 'npm test'
             }
         }
+
+        // =====================================================
+        // STEP 4 - Push Docker Image to DockerHub
+        // =====================================================
 
         stage('Push Docker Image') {
             steps {
@@ -43,25 +59,38 @@ pipeline {
             }
         }
 
-        // stage('Push Image to ECR') {
-//     steps {
-//         sh '''
-//         aws ecr get-login-password --region us-east-1 | \
-//         docker login --username AWS --password-stdin 202533496137.dkr.ecr.us-east-1.amazonaws.com
-//
-//         docker tag sample-node-app:latest \
-//         202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
-//
-//         docker push \
-//         202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
-//         '''
-//     }
-// }
+        // =====================================================
+        // OPTIONAL - Push Docker Image to Amazon ECR
+        // Uncomment this stage if using Amazon ECR
+        // =====================================================
+
+        /*
+        stage('Push Image to ECR') {
+            steps {
+                sh '''
+                aws ecr get-login-password --region us-east-1 | \
+                docker login --username AWS --password-stdin 202533496137.dkr.ecr.us-east-1.amazonaws.com
+
+                docker tag sample-node-app:latest \
+                202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
+
+                docker push \
+                202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
+                '''
+            }
+        }
+        */
+
+        // =====================================================
+        // OPTION 1 - Deploy on EC2 Docker Server
+        // CURRENT ACTIVE DEPLOYMENT
+        // =====================================================
 
         stage('Deploy') {
             steps {
                 sh '''
                 docker stop sample-node-app || true
+
                 docker rm sample-node-app || true
 
                 docker pull abhay93/sample-node-app:latest
@@ -73,5 +102,36 @@ pipeline {
                 '''
             }
         }
+
+        // =====================================================
+        // OPTION 2 - Deploy on Kubernetes
+        // Uncomment below stages if deploying on Kubernetes
+        // =====================================================
+
+        /*
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f deployment.yaml
+
+                kubectl apply -f service.yaml
+
+                kubectl rollout restart deployment/sample-node-app
+                '''
+            }
+        }
+
+        stage('Verify Kubernetes Deployment') {
+            steps {
+                sh '''
+                kubectl get pods
+
+                kubectl get svc
+
+                kubectl get deployments
+                '''
+            }
+        }
+        */
     }
 }

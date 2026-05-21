@@ -376,6 +376,10 @@ pipeline {
 
     stages {
 
+        
+        // STEP 1 - Checkout Source Code
+        
+
         stage('Checkout') {
             steps {
                 git branch: 'main',
@@ -383,13 +387,21 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        
+        // STEP 2 - Build Docker Image
+        
+
+        stage('Build Docker Image') {
             steps {
                 script {
                     docker.build("${IMAGE_NAME}:latest")
                 }
             }
         }
+
+        
+        // STEP 3 - Run Tests
+        
 
         stage('Test') {
             steps {
@@ -398,7 +410,11 @@ pipeline {
             }
         }
 
-        stage('Push Image to DockerHub') {
+        
+        // STEP 4 - Push Docker Image to DockerHub
+        
+
+        stage('Push Docker Image') {
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-creds') {
@@ -408,22 +424,32 @@ pipeline {
             }
         }
 
-        // Optional ECR Push Stage
+        
+        // OPTIONAL - Push Docker Image to Amazon ECR
+        // Uncomment this stage if using Amazon ECR
+        
 
-        // stage('Push Image to ECR') {
-        //     steps {
-        //         sh '''
-        //         aws ecr get-login-password --region us-east-1 | \
-        //         docker login --username AWS --password-stdin 202533496137.dkr.ecr.us-east-1.amazonaws.com
-        //
-        //         docker tag sample-node-app:latest \
-        //         202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
-        //
-        //         docker push \
-        //         202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
-        //         '''
-        //     }
-        // }
+        /*
+        stage('Push Image to ECR') {
+            steps {
+                sh '''
+                aws ecr get-login-password --region us-east-1 | \
+                docker login --username AWS --password-stdin 202533496137.dkr.ecr.us-east-1.amazonaws.com
+
+                docker tag sample-node-app:latest \
+                202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
+
+                docker push \
+                202533496137.dkr.ecr.us-east-1.amazonaws.com/sample-node-app:latest
+                '''
+            }
+        }
+        */
+
+        
+        // OPTION 1 - Deploy on EC2 Docker Server
+        // CURRENT ACTIVE DEPLOYMENT
+        
 
         stage('Deploy') {
             steps {
@@ -435,14 +461,46 @@ pipeline {
                 docker pull abhay93/sample-node-app:latest
 
                 docker run -d \
-                --name sample-node-app \
-                -p 80:3000 \
-                abhay93/sample-node-app:latest
+                  --name sample-node-app \
+                  -p 80:3000 \
+                  abhay93/sample-node-app:latest
                 '''
             }
         }
+
+        
+        // OPTION 2 - Deploy on Kubernetes
+        // Uncomment below stages if deploying on Kubernetes
+        
+
+        /*
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                kubectl apply -f deployment.yaml
+
+                kubectl apply -f service.yaml
+
+                kubectl rollout restart deployment/sample-node-app
+                '''
+            }
+        }
+
+        stage('Verify Kubernetes Deployment') {
+            steps {
+                sh '''
+                kubectl get pods
+
+                kubectl get svc
+
+                kubectl get deployments
+                '''
+            }
+        }
+        */
     }
 }
+
 ```
 
 ---

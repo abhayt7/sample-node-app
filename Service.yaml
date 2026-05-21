@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: sample-node-service
+
+spec:
+  type: LoadBalancer
+
+  selector:
+    app: sample-node-app
+
+  ports:
+    - port: 80
+      targetPort: 3000

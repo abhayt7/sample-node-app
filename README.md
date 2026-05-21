@@ -12,6 +12,7 @@ This project demonstrates a complete DevOps CI/CD pipeline implementation using:
 * Kubernetes
 * Prometheus
 * Grafana
+* Domain (GoDaddy) + AWS Route53
 
 The pipeline automatically:
 
@@ -19,8 +20,9 @@ The pipeline automatically:
 2. Builds Docker image
 3. Runs basic tests
 4. Pushes Docker image to DockerHub
-5. Deploys containerized application to AWS EC2
+5. Deploys containerized application to AWS EC2 / Kubernetes
 6. Monitors application using Prometheus and Grafana
+7. Exposes application using custom domain (Route53 + GoDaddy)
 
 ---
 
@@ -43,27 +45,33 @@ Run Tests
         ↓
 Push Docker Image to DockerHub
         ↓
-Deploy Container to AWS EC2
+Deploy to AWS EC2 / Kubernetes
         ↓
-Monitor using Prometheus & Grafana
+Monitoring (Prometheus + Grafana)
+        ↓
+Route53 DNS Mapping
+        ↓
+GoDaddy Custom Domain Access
 ```
 
 ---
 
 # Tools & Technologies Used
 
-| Tool       | Purpose                 |
-| ---------- | ----------------------- |
-| Git        | Version control         |
-| GitHub     | Source code repository  |
-| Jenkins    | CI/CD automation        |
-| Docker     | Containerization        |
-| DockerHub  | Docker image registry   |
-| AWS EC2    | Deployment server       |
-| Kubernetes | Container orchestration |
-| Prometheus | Monitoring              |
-| Grafana    | Visualization dashboard |
-| Node.js    | Sample application      |
+| Tool       | Purpose                |
+| ---------- | ---------------------- |
+| Git        | Version control        |
+| GitHub     | Source code repository |
+| Jenkins    | CI/CD automation       |
+| Docker     | Containerization       |
+| DockerHub  | Image registry         |
+| AWS EC2    | Deployment server      |
+| Kubernetes | Orchestration          |
+| Prometheus | Monitoring             |
+| Grafana    | Visualization          |
+| Node.js    | Sample application     |
+| Route53    | DNS management         |
+| GoDaddy    | Domain provider        |
 
 ---
 
@@ -84,31 +92,17 @@ sample-node-app/
 
 ---
 
-# Step 1: Create GitHub Repository
+# Step 1: GitHub Repository
 
-Created GitHub repository:
-
-```text
-sample-node-app
-```
-
-GitHub Repository Link:
+Repository:
 
 ```text
 https://github.com/abhayt7/sample-node-app
 ```
 
-Clone repository:
-
-```bash
-git clone https://github.com/abhayt7/sample-node-app.git
-
-cd sample-node-app
-```
-
 ---
 
-# Step 2: Create Node.js Application
+# Step 2: Node.js Application
 
 ## package.json
 
@@ -116,8 +110,6 @@ cd sample-node-app
 {
   "name": "sample-node-app",
   "version": "1.0.0",
-  "description": "DevOps CI/CD Pipeline Assignment",
-  "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "test": "echo \"Tests Passed Successfully\""
@@ -128,239 +120,38 @@ cd sample-node-app
 }
 ```
 
----
-
 ## app.js
 
 ```javascript
 const express = require('express');
-
 const app = express();
 
 app.get('/', (req, res) => {
-    res.send('CI/CD Pipeline Working Successfully!');
+  res.send('CI/CD Pipeline Working Successfully!');
 });
 
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
+app.listen(3000, () => console.log('Server running on port 3000'));
 ```
 
 ---
 
-# Step 3: Install Dependencies
-
-```bash
-npm install
-```
-
----
-
-# Step 4: Create .env.example
-
-```env
-PORT=3000
-```
-
----
-
-# Step 5: Dockerize Application
+# Step 3: Docker Setup
 
 ## Dockerfile
 
 ```dockerfile
 FROM node:18
-
 WORKDIR /app
-
 COPY package.json .
-
 RUN npm install
-
 COPY . .
-
 EXPOSE 3000
-
 CMD ["node","app.js"]
 ```
 
 ---
 
-# Step 6: Build Docker Image Locally
-
-```bash
-docker build -t sample-node-app .
-```
-
----
-
-# Step 7: Run Docker Container Locally
-
-```bash
-docker run -d -p 3000:3000 sample-node-app
-```
-
-Verify:
-
-```text
-http://localhost:3000
-```
-
-Expected Output:
-
-```text
-CI/CD Pipeline Working Successfully!
-```
-
----
-
-# Step 8: Push Code to GitHub
-
-```bash
-git init
-
-git add .
-
-git commit -m "Initial CI/CD setup"
-
-git branch -M main
-
-git remote add origin https://github.com/abhayt7/sample-node-app.git
-
-git push -u origin main
-```
-
----
-
-# Step 9: AWS EC2 Setup
-
-Created AWS EC2 Ubuntu instance.
-
-## EC2 Configuration
-
-| Configuration | Value        |
-| ------------- | ------------ |
-| AMI           | Ubuntu 22.04 |
-| Instance Type | t2.medium    |
-| Storage       | 20 GB        |
-
----
-
-## Opened Security Group Ports
-
-| Port | Purpose     |
-| ---- | ----------- |
-| 22   | SSH         |
-| 80   | Application |
-| 8080 | Jenkins     |
-| 9090 | Prometheus  |
-| 3001 | Grafana     |
-
----
-
-# Step 10: Install Docker on EC2
-
-```bash
-sudo apt update
-
-sudo apt install docker.io -y
-
-sudo systemctl start docker
-
-sudo systemctl enable docker
-```
-
-Add user permissions:
-
-```bash
-sudo usermod -aG docker ubuntu
-sudo usermod -aG docker jenkins
-```
-
----
-
-# Step 11: Install Java
-
-```bash
-sudo apt install openjdk-17-jdk -y
-```
-
-Verify:
-
-```bash
-java -version
-```
-
----
-
-# Step 12: Install Jenkins
-
-```bash
-curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
-/usr/share/keyrings/jenkins-keyring.asc > /dev/null
-```
-
-```bash
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
-/etc/apt/sources.list.d/jenkins.list > /dev/null
-```
-
-```bash
-sudo apt update
-
-sudo apt install jenkins -y
-```
-
-Start Jenkins:
-
-```bash
-sudo systemctl start jenkins
-sudo systemctl enable jenkins
-```
-
----
-
-# Step 13: Access Jenkins
-
-```text
-http://EC2_PUBLIC_IP:8080
-```
-
-Get Jenkins password:
-
-```bash
-sudo cat /var/lib/jenkins/secrets/initialAdminPassword
-```
-
----
-
-# Step 14: Install Jenkins Plugins
-
-Installed plugins:
-
-* Git
-* Pipeline
-* Docker Pipeline
-* GitHub Integration
-* NodeJS
-* Blue Ocean
-
----
-
-# Step 15: Configure DockerHub Credentials
-
-Added DockerHub credentials in Jenkins.
-
-Credential ID:
-
-```text
-dockerhub-creds
-```
-
----
-
-# Step 16: Create Jenkins Pipeline
+# Step 4: Jenkins CI/CD Pipeline
 
 ## Jenkinsfile
 
@@ -380,12 +171,11 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                url: 'https://github.com/abhayt7/sample-node-app.git'
+                git branch: 'main', url: 'https://github.com/abhayt7/sample-node-app.git'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
                     docker.build("${IMAGE_NAME}:latest")
@@ -400,7 +190,7 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push Image') {
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-creds') {
@@ -418,10 +208,7 @@ pipeline {
 
                 docker pull abhay93/sample-node-app:latest
 
-                docker run -d \
-                  --name sample-node-app \
-                  -p 80:3000 \
-                  abhay93/sample-node-app:latest
+                docker run -d --name sample-node-app -p 80:3000 abhay93/sample-node-app:latest
                 '''
             }
         }
@@ -431,132 +218,77 @@ pipeline {
 
 ---
 
-# Step 17: Configure GitHub Webhook
+# Step 5: AWS EC2 Setup
 
-Configured GitHub webhook to automatically trigger Jenkins pipeline when code is pushed.
+* Ubuntu 22.04
+* t2.medium
 
-Webhook URL:
+Open ports:
 
-```text
-http://EC2_PUBLIC_IP:8080/github-webhook/
-```
+* 22 SSH
+* 80 App
+* 8080 Jenkins
+* 9090 Prometheus
+* 3001 Grafana
 
-Webhook Event:
+---
 
-```text
-Just the push event
+# Step 6: Kubernetes Setup (Clean Installation)
+
+```bash
+sudo swapoff -a
+sudo apt update
+sudo apt install -y docker.io apt-transport-https ca-certificates curl
+
+sudo apt install -y kubelet kubeadm kubectl
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 ```
 
 ---
 
-# Step 18: Configure Jenkins Job
-
-Created Jenkins Pipeline Job:
-
-```text
-sample-node-app-pipeline
-```
-
-Pipeline Configuration:
-
-| Setting       | Value                    |
-| ------------- | ------------------------ |
-| Pipeline Type | Pipeline script from SCM |
-| SCM           | Git                      |
-| Branch        | */main                   |
-| Script Path   | Jenkinsfile              |
-
----
-
-# Step 19: CI/CD Pipeline Execution
-
-Whenever developer pushes code:
-
-```text
-Git Push
-   ↓
-GitHub Webhook Triggered
-   ↓
-Jenkins Pipeline Started
-   ↓
-Checkout Source Code
-   ↓
-Build Docker Image
-   ↓
-Run Tests
-   ↓
-Push Image to DockerHub
-   ↓
-Deploy Latest Container
-```
-
----
-
-# Step 20: DockerHub Image
-
-Docker Image:
-
-```text
-abhay93/sample-node-app:latest
-```
-
-DockerHub Repository:
-
-```text
-https://hub.docker.com/r/abhay93/sample-node-app
-```
-
----
-
-# Step 21: Deployment Configuration
+# Step 7: Kubernetes Deployment
 
 ## deployment.yaml
 
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
   name: sample-node-app
-
 spec:
   replicas: 2
-
   selector:
     matchLabels:
       app: sample-node-app
-
   template:
     metadata:
       labels:
         app: sample-node-app
-
     spec:
       containers:
       - name: sample-node-app
         image: abhay93/sample-node-app:latest
-
         ports:
         - containerPort: 3000
 ```
-
----
 
 ## service.yaml
 
 ```yaml
 apiVersion: v1
 kind: Service
-
 metadata:
   name: sample-node-service
-
 spec:
   type: LoadBalancer
-
   selector:
     app: sample-node-app
-
   ports:
     - port: 80
       targetPort: 3000
@@ -564,136 +296,83 @@ spec:
 
 ---
 
-# Step 22: Kubernetes Deployment
-
-Deploy resources:
-
-```bash
-kubectl apply -f deployment.yaml
-
-kubectl apply -f service.yaml
-```
-
-Verify:
-
-```bash
-kubectl get pods
-kubectl get svc
-```
-
----
-
-# Step 23: Monitoring Setup
+# Step 8: Monitoring
 
 ## Prometheus
 
-Run Prometheus container:
-
 ```bash
-docker run -d \
---name prometheus \
--p 9090:9090 \
-prom/prometheus
+docker run -d -p 9090:9090 prom/prometheus
 ```
-
-Access:
-
-```text
-http://EC2_PUBLIC_IP:9090
-```
-
----
 
 ## Grafana
 
-Run Grafana container:
-
 ```bash
-docker run -d \
---name grafana \
--p 3001:3000 \
-grafana/grafana
-```
-
-Access:
-
-```text
-http://EC2_PUBLIC_IP:3001
-```
-
-Default Login:
-
-```text
-Username: admin
-Password: admin
+docker run -d -p 3001:3000 grafana/grafana
 ```
 
 ---
 
-# Metrics Monitored
+# Step 9: Domain Setup (GoDaddy + Route53)
 
-* CPU Usage
-* Memory Usage
-* Container Health
-* Container Status
+## Flow
+
+```text
+GoDaddy Domain → Route53 Hosted Zone → EC2 IP Mapping → Application
+```
+
+## Steps
+
+1. Buy domain from GoDaddy (example: cdec45.shop)
+2. Create Route53 Hosted Zone
+3. Copy Route53 NS records to GoDaddy
+4. Create A record:
+
+   * cdec45.shop → EC2 IP
+
+Now access app via:
+
+```text
+http://myapp.cdec45.shop
+```
 
 ---
 
-# Running Application URL
+# Step 10: Final CI/CD Flow
 
 ```text
-http://EC2_PUBLIC_IP
+Git Push
+↓
+GitHub Webhook
+↓
+Jenkins Pipeline
+↓
+Docker Build
+↓
+Docker Push
+↓
+Deploy (EC2/K8s)
+↓
+Monitoring
+↓
+Route53 DNS
+↓
+GoDaddy Domain
+↓
+Public Application URL
 ```
 
 ---
 
 # Deliverables
 
-## 1. GitHub Repository Link
-
-```text
-https://github.com/abhayt7/sample-node-app
-```
-
----
-
-## 2. Dockerfile
-
-Included in repository.
-
----
-
-## 3. Jenkinsfile
-
-Included in repository.
-
----
-
-## 4. Running Application URL
-
-```text
-http://EC2_PUBLIC_IP
-```
-
----
-
-## 5. Deployment Configuration
-
-Files included:
-
-* deployment.yaml
-* service.yaml
-
----
-
-# Project Outcome
-
-Successfully implemented a complete CI/CD pipeline using Jenkins, Docker, DockerHub, AWS EC2, Kubernetes, Prometheus, and Grafana.
-
-The pipeline automatically builds, tests, pushes, and deploys the application whenever code is pushed to GitHub.
+* GitHub Repository: [https://github.com/abhayt7/sample-node-app]
+* Dockerfile
+* Jenkinsfile
+* Kubernetes YAML files
+* Running URL: cdec45.shop
 
 ---
 
 # Author
 
-Name: Abhay Tarone
+Abhay Tarone

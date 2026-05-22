@@ -58,19 +58,21 @@ Deploy to EC2 / Kubernetes
 
 # Tools & Technologies
 
-| Tool       | Purpose            |
-| ---------- | ------------------ |
-| Git        | Version Control    |
-| GitHub     | Source Repository  |
-| Jenkins    | CI/CD Automation   |
-| Docker     | Containerization   |
-| DockerHub  | Public Registry    |
-| Amazon ECR | AWS Registry       |
-| AWS EC2    | Deployment Server  |
-| Kubernetes | Orchestration      |
-| Prometheus | Monitoring         |
-| Grafana    | Dashboard          |
-| Node.js    | Sample Application |
+| Tool           | Purpose            |
+| ----------     | ------------------ |
+| Git            | Version Control    |
+| GitHub         | Source Repository  |
+| Jenkins        | CI/CD Automation   |
+| Docker         | Containerization   |
+| DockerHub      | Public Registry    |
+| Amazon ECR     | AWS Registry       |
+| AWS EC2        | Deployment Server  |
+| Kubernetes     | Orchestration      |
+| Prometheus     | Monitoring         |
+| Grafana        | Dashboard          |
+| Amazon Route 53| DNS Management     |
+| GoDaddy        | Domain Registration
+| Node.js        | Sample Application |
 
 ---
 

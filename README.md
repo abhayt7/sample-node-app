@@ -125,6 +125,7 @@ cd sample-node-app
   },
   "dependencies": {
     "express": "^4.18.2"
+    "prom-client": "^15.1.3"
   }
 }
 ```
